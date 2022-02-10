@@ -187,6 +187,16 @@ void display(WINDOW *canvas)
 	
 	int x,y;
 	getyx(canvas,y,x);
+	
+	mvwhline(canvas,y+ver_pad,hor_pad,0,(columns+1)*hor_pad);
+	mvwvline(canvas,y+ver_pad+1,hor_pad,0,(rows+1)*ver_pad);
+	mvwhline(canvas,y+((rows+2)*ver_pad),hor_pad,0,(columns+1)*hor_pad);
+	mvwvline(canvas,y+ver_pad,(columns+2)*hor_pad,0,(rows+1)*ver_pad);
+	mvwaddch(canvas,y+ver_pad,hor_pad,ACS_ULCORNER);
+	mvwaddch(canvas,y+((rows+2)*ver_pad),hor_pad,ACS_LLCORNER);
+	mvwaddch(canvas,y+ver_pad,(columns+2)*hor_pad,ACS_URCORNER);
+	mvwaddch(canvas,y+((rows+2)*ver_pad),(columns+2)*hor_pad,ACS_LRCORNER);
+	
 	wmove(canvas,y+(2*ver_pad),2*hor_pad);
 	getyx(canvas,y,x);
 	for(int i=0;i<rows;i++)												//loop for printing grid
