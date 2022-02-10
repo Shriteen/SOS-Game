@@ -48,12 +48,6 @@ void save_game();											//saves variables related to game in a file
 void load_game();											//loads variables related to game from file
 void statistics();											//display records from file
 
-int generic_menu(WINDOW *win,const char* options[],int num_options);	//accept a list of options and number of options
-																		//0th item in list is title of menu
-																		//displays options and return number of option selected
-																		//index is 1 based
-
-
 int main()
 {
 	initscr();
@@ -63,13 +57,27 @@ int main()
 	
 	do
 	{
-		const char *options[]={	"Menu",
-							"Start New Game",
-							"Continue Saved Game",
-							"Help",
-							"Records",
-							"Exit"				};
-		ch=generic_menu(stdscr,options,5);	
+		clear();
+		printw("\n\t\tMenu\n\n");
+		printw("\t1: Start New Game\n");
+		printw("\t2: Continue Saved Game\n");
+		printw("\t3: Help\n");
+		printw("\t4: Records\n");
+		printw("\t5: Exit\n");
+		printw("\nEnter your choice:");
+		
+		refresh();
+		
+		do
+		{
+			scanw("%d",&ch);
+			invalid=(ch<1 || ch>5);
+			if(invalid)
+			{
+				printw("Invalid option...Try again\n");
+				refresh();
+			}
+		}while(invalid);
 		
 		switch(ch)
 		{
@@ -627,44 +635,4 @@ void statistics()
 	printw("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
 	refresh();
 	scanw("%*c%*c");
-}
-
-int generic_menu(WINDOW *win,const char* options[],int num_options)
-{
-	noecho();
-	keypad(win,TRUE);
-	wclear(win);
-	mvwprintw(win,1,30,"%s",options[0]);
-	int selected=1;
-	for(int i=1;i<=num_options;i++)
-	{
-		mvwprintw(win,2+i,15,"%s",options[i]);
-	}
-	mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);
-	wrefresh(win);
-	while(1)
-	{
-		int ch=wgetch(win);
-		mvwchgat(win,2+selected,0,-1,A_NORMAL,0,NULL);
-		switch(ch)
-		{
-			case KEY_UP:
-				if(selected==1)
-					selected=num_options;
-				else
-					selected--;
-				break;
-			case KEY_DOWN:
-				if(selected==num_options)
-					selected=1;
-				else
-					selected++;
-				break;
-			case 10:
-				echo();
-				return selected;
-		}
-		mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);
-		wrefresh(win);
-	}
 }
