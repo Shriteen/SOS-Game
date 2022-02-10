@@ -53,6 +53,8 @@ int generic_menu(WINDOW *win,const char* options[],int num_options);	//accept a 
 																		//0th item in list is title of menu
 																		//displays options and return number of option selected
 																		//index is 1 based
+int generic_boolean_menu(WINDOW *win,const char* question);				//accepts a title (question) and displays yes or no options
+																		//returns 1 if yes, 0 otherwise
 
 
 int main()
@@ -274,7 +276,6 @@ void game()
 					wrefresh(canvas);
 				}
 			}while(invalid);
-			
 			game_move(pos_i,pos_j,letter);
 		}
 
@@ -464,37 +465,25 @@ int pause()
 	int invalid;
 	int ch;
 	char yes_or_no;
+	WINDOW *pause_menu=newwin(0,0,0,0);
 	
-	clear();
-	printw("\n\t\tGame paused\n\n");
-	printw("\t1: Resume\n");
-	printw("\t2: Restart\n");
-	printw("\t3: Exit\n");
-	printw("\nEnter your choice:");
-	refresh();
-	do
-	{
-		scanw("%d",&ch);
-		invalid=(ch<1 || ch>3);
-		if(invalid)
-		{
-			printf("Invalid option...Try again\n");
-			refresh();			
-		}
-	}while(invalid);
-	
+	const char *options[]={	"Game paused",
+							"Resume",
+							"Restart",
+							"Exit"
+										};
+	ch=generic_menu(pause_menu,options,3);
 	switch(ch)
 	{
 		case 2:
 			reset();
 		case 1:
+			delwin(pause_menu);
 			return 1;
 		case 3:
-			printw("Do you wish to save game for later?\n(y/N)");		//prompt for asking for saving to file
-			refresh();
-			scanw("%*c%c",&yes_or_no);
-			if(tolower(yes_or_no)=='y')
+			if(generic_boolean_menu(pause_menu,"Do you wish to save game for later?"))
 				save_game();				
+			delwin(pause_menu);
 			return 0;
 	}
 }
@@ -660,4 +649,17 @@ int generic_menu(WINDOW *win,const char* options[],int num_options)
 		mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);
 		wrefresh(win);
 	}
+}
+
+int generic_boolean_menu(WINDOW *win,const char* question)
+{
+	int ch;
+	const char *options[]={	question,
+							"No",
+							"Yes"	};
+	ch=generic_menu(win,options,2);
+	if(ch==1)
+		return 0;
+	else
+		return 1;
 }
