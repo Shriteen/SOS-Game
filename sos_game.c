@@ -4,9 +4,6 @@
 #include<ctype.h>
 #include<ncurses.h>
 
-#define CLEAR "clear"
-//On Unix and Unix-like systems like linux and macos above should be #define CLEAR "clear"
-//On windows it should be #define CLEAR "cls"
 #define MAX_PLAYERS 10
 //Maximum players in a game
 #define MAX_WIDTH 14
@@ -583,7 +580,7 @@ void save_game()
 void load_game()
 {
 	FILE *fp=fopen("saved_game","rb");
-	system(CLEAR);
+	clear();
 	if(fp)
 	{
 		fread(&num_of_players,sizeof(int),1,fp);
@@ -608,7 +605,7 @@ void load_game()
 void statistics()
 {
 	FILE *fp=fopen("records.txt","r");
-	system(CLEAR);
+	clear();
 	if(fp)
 	{
 		int num,r,c;
