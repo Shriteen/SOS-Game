@@ -69,6 +69,7 @@ int main()
 								"Records",
 								"Exit"				};
 		ch=generic_menu(stdscr,options,5);						//display and input main menu
+		clear();
 		switch(ch)
 		{
 			case 1:
@@ -91,58 +92,62 @@ int main()
 
 void start()
 {
-	clear();
+	WINDOW *wizard=newwin(0,0,0,0);
+	wclear(wizard);
 	int invalid;											//variable used to check validity of input
 	
-	printw("Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);								//input number of players
-	refresh();
+	wprintw(wizard,"Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);								//input number of players
+	wrefresh(wizard);
 	do
 	{
-		scanw("%d",&num_of_players);
+		wscanw(wizard,"%d",&num_of_players);
 		invalid=(num_of_players<2 || num_of_players>MAX_PLAYERS);
 		if(invalid)
 		{
-			printw("Number of players must be between 2 and %d\nTry again\n",MAX_PLAYERS);
-			refresh();
+			wprintw(wizard,"Number of players must be between 2 and %d\nTry again\n",MAX_PLAYERS);
+			wrefresh(wizard);
 		}
 	}while(invalid);
 	
-	printw("Enter player names\t\t(It should be one word without spaces)\n");						//input player names
-	refresh();
+	wprintw(wizard,"Enter player names\t\t(It should be one word without spaces)\n");						//input player names
+	wrefresh(wizard);
 	for(int i=0;i<num_of_players;i++)
 	{
-		printw("Enter name of player %d:",i+1);
-		refresh();
-		scanw("%s",players[i].name);
+		wprintw(wizard,"Enter name of player %d:",i+1);
+		wrefresh(wizard);
+		wscanw(wizard,"%s",players[i].name);
 	}
 	
-	printw("Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);						//input number of rows
-	refresh();
+	wprintw(wizard,"Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);						//input number of rows
+	wrefresh(wizard);
 	do
 	{
-		scanw("%d",&rows);
+		wscanw(wizard,"%d",&rows);
 		invalid=(rows<MIN_HEIGHT || rows>MAX_HEIGHT);
 		if(invalid)
 		{
-			printw("Number of rows must be between %d and %d\nTry again\n",MIN_HEIGHT,MAX_HEIGHT);
-			refresh();
+			wprintw(wizard,"Number of rows must be between %d and %d\nTry again\n",MIN_HEIGHT,MAX_HEIGHT);
+			wrefresh(wizard);
 		}
 	}while(invalid);
 	
-	printw("Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);						//input number of columns
-	refresh();
+	wprintw(wizard,"Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);						//input number of columns
+	wrefresh(wizard);
 	do
 	{
-		scanw("%d",&columns);
+		wscanw(wizard,"%d",&columns);
 		invalid=(columns<MIN_WIDTH || columns>MAX_WIDTH);
 		if(invalid)
 		{
-			printw("Number of columns must be between %d and %d\nTry again\n",MIN_WIDTH,MAX_WIDTH);
-			refresh();
+			wprintw(wizard,"Number of columns must be between %d and %d\nTry again\n",MIN_WIDTH,MAX_WIDTH);
+			wrefresh(wizard);
 		}
 	}while(invalid);
 	
 	reset();
+	wclear(wizard);
+	wrefresh(wizard);
+	delwin(wizard);
 	game();
 }
 
@@ -164,56 +169,40 @@ void print_n_times(char c,int n)
 		addch(c);
 }
 
-void display()
+void display(WINDOW *canvas)
 {
-	clear();
-	
-	printw("%-30s%s\n","Name of player","Score");						//display player names and scores
+	wclear(canvas);
+		
+	mvwprintw(canvas,0,0,"%-30s%s\n","Name of player","Score");						//display player names and scores	
 	for(int i=0;i<num_of_players;i++)
 	{
-		printw("%-30s%5d\n",players[i].name,players[i].score);
+		wprintw(canvas,"%-30s%5d\n",players[i].name,players[i].score);
 	}
-	print_n_times('=',VIEW_WIDTH);
+	wrefresh(canvas);
+	whline(canvas,'=',COLS);
 	
 	int hor_pad=round((float)VIEW_WIDTH/(float)(columns+3));			//compute horizontal gap
 	int ver_pad=round(hor_pad*0.47);									//compute vertical gap
 	int count=1;														//count the position number
 	
-	print_n_times('\n',ver_pad);										//print newlines for top padding of grid
-	printw("%*s",hor_pad,"+");											//print top border
-	print_n_times('-',((columns+1)*hor_pad)-1);
-	printw("+\n");
+	int x,y;
+	getyx(canvas,y,x);
+	wmove(canvas,y+(2*ver_pad),2*hor_pad);
+	getyx(canvas,y,x);
 	for(int i=0;i<rows;i++)												//loop for printing grid
-	{
-		for(int k=0;k<ver_pad-1;k++)									//print newlines for vertical gap in table;
-		{																//also print parts of side borders
-			printw("%*s",hor_pad,"|");
-			printw("%*s\n",((columns+1)*hor_pad),"|");
-		}
-		
-		printw("%*s",hor_pad,"|");										//printing line containing row elements
+	{	
 		for(int j=0;j<columns;j++)
 		{
+			wmove(canvas,y+(ver_pad*i),x+(hor_pad*j));
 			if(grid[i][j]=='\0')										//if element is null character print number in that place
-				printw("%*d",hor_pad,count);							//else print the letter
+				wprintw(canvas,"%d",count);							//else print the letter
 			else
-				printw("%*c",hor_pad,grid[i][j]);
+				wprintw(canvas,"%c",grid[i][j]);
 			count++;
 		}
-		printw("%*s\n",hor_pad,"|");
 	}
-	for(int k=0;k<ver_pad-1;k++)										//print newlines for vertical gap after last row;
-	{																	//also print parts of side borders
-		printw("%*s",hor_pad,"|");
-		printw("%*s\n",((columns+1)*hor_pad),"|");
-	}
-	printw("%*s",hor_pad,"+");											//print bottom border
-	print_n_times('-',((columns+1)*hor_pad)-1);
-	printw("+");
-	print_n_times('\n',ver_pad);										//print newlines for bottom padding of grid
-	print_n_times('=',VIEW_WIDTH);
-	printw("\n");
-	refresh();
+	wrefresh(canvas);
+	wgetch(canvas);
 }
 
 int game_is_not_over()
@@ -234,9 +223,11 @@ void game()
 	int invalid;																//temprory variable to check if input is valid
 	int pos_i,pos_j;															//variables to store position in matrix
 	
+	WINDOW *canvas=newwin(0,0,0,0);
+	
 	while(game_is_not_over() && pause_returned)									//game will run until there is empty place or not exited via pause
 	{
-		display();
+		display(canvas);
 		printw("Turn of %s\n",players[turn%num_of_players].name);
 		
 		do 																		//repeat until S,O or P is input
@@ -289,7 +280,7 @@ void game()
 		refresh();
 		scanw("%*c%*c");
 	}															
-	
+	delwin(canvas);
 }
 
 void game_move(int pos_i,int pos_j,char letter)
@@ -424,7 +415,8 @@ void results()
 	FILE *fp=fopen("records.txt","a");											//open file for appending records
 	fprintf(fp,"%d %d*%d ",num_of_players,rows,columns);						//write number of players, rows and columns to file
 	
-	display();
+	//display();
+	printw("Display supressed in result function\n");
 	if(count==1)																//there is only one winner
 	{
 		printw("\n%s won with %d score!!\n",players[max_index].name,max);		//display on screen
