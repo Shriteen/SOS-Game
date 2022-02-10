@@ -212,7 +212,6 @@ void display(WINDOW *canvas)
 		}
 	}
 	wrefresh(canvas);
-	wgetch(canvas);
 }
 
 int game_is_not_over()
@@ -238,19 +237,18 @@ void game()
 	while(game_is_not_over() && pause_returned)									//game will run until there is empty place or not exited via pause
 	{
 		display(canvas);
-		printw("Turn of %s\n",players[turn%num_of_players].name);
-		
+		mvwprintw(canvas,LINES-4,0,"Turn of %s\n",players[turn%num_of_players].name);
+		mvwprintw(canvas,LINES-3,0,"Enter the letter:");
+		wrefresh(canvas);
 		do 																		//repeat until S,O or P is input
 		{
-			printw("Enter the letter:");
-			refresh();
-			scanw(" %c",&letter);
+			wscanw(canvas," %c",&letter);
 			letter=toupper(letter);
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
 			{
-				printw("Invalid letter...Try again\n");
-				refresh();
+				mvwprintw(canvas,LINES-3,0,"Invalid letter...Try again\n");
+				wrefresh(canvas);
 			}
 				
 		}while(invalid);
@@ -264,18 +262,17 @@ void game()
 			int position;
 			do 																	//input position of move
 			{
-				printw("Enter the position number:");
-				refresh();
-				scanw("%d",&position);
+				mvwprintw(canvas,LINES-3,0,"Enter the position number:");
+				wrefresh(canvas);
+				wscanw(canvas,"%d",&position);
 				pos_i=(position-1)/columns;
 				pos_j=(position-1)%columns;
 				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
 				if(invalid)
 				{
-					printw("Invalid position...Try again\n");
-					refresh();
+					mvwprintw(canvas,LINES-3,0,"Invalid position...Try again\n");
+					wrefresh(canvas);
 				}
-					
 			}while(invalid);
 			
 			game_move(pos_i,pos_j,letter);
