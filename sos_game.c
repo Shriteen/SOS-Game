@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<math.h>
 #include<ctype.h>
+#include<ncurses.h>
 
 #define CLEAR "clear"
 //On Unix and Unix-like systems like linux and macos above should be #define CLEAR "clear"
@@ -39,7 +40,7 @@ void print_n_times(char c,int n);							//a utility function to print given char
 int game_is_not_over();										//checks if there is some place empty,
 															//if a place is empty returns 1, if no place empty returns 0
 void game();												//the loop in which gameplay happens
-void move(int pos_i,int pos_j,char letter);					//puts the letter at its position,
+void game_move(int pos_i,int pos_j,char letter);					//puts the letter at its position,
 															//check if scoring and increment score,
 															//if not scored then increment turn
 
@@ -259,7 +260,7 @@ void game()
 					printf("Invalid position...Try again\n");
 			}while(invalid);
 			
-			move(pos_i,pos_j,letter);
+			game_move(pos_i,pos_j,letter);
 		}
 
 	}
@@ -273,7 +274,7 @@ void game()
 	
 }
 
-void move(int pos_i,int pos_j,char letter)
+void game_move(int pos_i,int pos_j,char letter)
 {
 	int scored=0;
 	
