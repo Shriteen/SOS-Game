@@ -4,6 +4,7 @@
 #include<ctype.h>
 #include<ncurses.h>
 
+
 #define MAX_PLAYERS 10
 //Maximum players in a game
 #define MAX_WIDTH 14
