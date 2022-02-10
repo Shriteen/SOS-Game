@@ -59,19 +59,16 @@ int main()
 {
 	initscr();
 	
-	int invalid;
 	int ch;
-	
 	do
 	{
-		const char *options[]={	"Menu",
-							"Start New Game",
-							"Continue Saved Game",
-							"Help",
-							"Records",
-							"Exit"				};
-		ch=generic_menu(stdscr,options,5);	
-		
+		const char *options[]={	"Menu",							//options of main menu
+								"Start New Game",
+								"Continue Saved Game",
+								"Help",
+								"Records",
+								"Exit"				};
+		ch=generic_menu(stdscr,options,5);						//display and input main menu
 		switch(ch)
 		{
 			case 1:
@@ -85,10 +82,6 @@ int main()
 				break;
 			case 4:
 				statistics();
-				break;
-			case 5:
-				printw("Exiting...\n");
-				refresh();
 				break;
 		}
 	}while(ch!=5);
