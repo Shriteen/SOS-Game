@@ -53,25 +53,33 @@ void statistics();											//display records from file
 
 int main()
 {
+	initscr();
+	
 	int invalid;
 	int ch;
 	
 	do
 	{
-		system(CLEAR);
-		printf("\n\t\tMenu\n\n");
-		printf("\t1: Start New Game\n");
-		printf("\t2: Continue Saved Game\n");
-		printf("\t3: Help\n");
-		printf("\t4: Records\n");
-		printf("\t5: Exit\n");
-		printf("\nEnter your choice:");
+		clear();
+		printw("\n\t\tMenu\n\n");
+		printw("\t1: Start New Game\n");
+		printw("\t2: Continue Saved Game\n");
+		printw("\t3: Help\n");
+		printw("\t4: Records\n");
+		printw("\t5: Exit\n");
+		printw("\nEnter your choice:");
+		
+		refresh();
+		
 		do
 		{
-			scanf("%d",&ch);
+			scanw("%d",&ch);
 			invalid=(ch<1 || ch>5);
 			if(invalid)
-				printf("Invalid option...Try again\n");
+			{
+				printw("Invalid option...Try again\n");
+				refresh();
+			}
 		}while(invalid);
 		
 		switch(ch)
@@ -89,51 +97,66 @@ int main()
 				statistics();
 				break;
 			case 5:
-				printf("Exiting...\n");
+				printw("Exiting...\n");
+				refresh();
 				break;
 		}
 	}while(ch!=5);
 	
-	
+	endwin();
 }
 
 void start()
 {
-	system(CLEAR);											//clear screen
+	clear();
 	int invalid;											//variable used to check validity of input
 	
-	printf("Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);								//input number of players
+	printw("Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);								//input number of players
+	refresh();
 	do
 	{
-		scanf("%d",&num_of_players);
+		scanw("%d",&num_of_players);
 		invalid=(num_of_players<2 || num_of_players>MAX_PLAYERS);
 		if(invalid)
-			printf("Number of players must be between 2 and %d\nTry again\n",MAX_PLAYERS);
+		{
+			printw("Number of players must be between 2 and %d\nTry again\n",MAX_PLAYERS);
+			refresh();
+		}
 	}while(invalid);
 	
-	printf("Enter player names\t\t(It should be one word without spaces)\n");						//input player names
+	printw("Enter player names\t\t(It should be one word without spaces)\n");						//input player names
+	refresh();
 	for(int i=0;i<num_of_players;i++)
 	{
-		printf("Enter name of player %d:",i+1);
-		scanf("%s",players[i].name);
+		printw("Enter name of player %d:",i+1);
+		refresh();
+		scanw("%s",players[i].name);
 	}
 	
-	printf("Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);						//input number of rows
+	printw("Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);						//input number of rows
+	refresh();
 	do
 	{
-		scanf("%d",&rows);
+		scanw("%d",&rows);
 		invalid=(rows<MIN_HEIGHT || rows>MAX_HEIGHT);
 		if(invalid)
-			printf("Number of rows must be between %d and %d\nTry again\n",MIN_HEIGHT,MAX_HEIGHT);
+		{
+			printw("Number of rows must be between %d and %d\nTry again\n",MIN_HEIGHT,MAX_HEIGHT);
+			refresh();
+		}
 	}while(invalid);
 	
-	printf("Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);						//input number of columns
+	printw("Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);						//input number of columns
+	refresh();
 	do
 	{
-		scanf("%d",&columns);
+		scanw("%d",&columns);
 		invalid=(columns<MIN_WIDTH || columns>MAX_WIDTH);
 		if(invalid)
-			printf("Number of columns must be between %d and %d\nTry again\n",MIN_WIDTH,MAX_WIDTH);
+		{
+			printw("Number of columns must be between %d and %d\nTry again\n",MIN_WIDTH,MAX_WIDTH);
+			refresh();
+		}
 	}while(invalid);
 	
 	reset();
@@ -155,17 +178,17 @@ void reset()
 void print_n_times(char c,int n)
 {
 	for(int i=0;i<n;i++)
-		putchar(c);
+		addch(c);
 }
 
 void display()
 {
-	system(CLEAR);
+	clear();
 	
-	printf("%-30s%s\n","Name of player","Score");						//display player names and scores
+	printw("%-30s%s\n","Name of player","Score");						//display player names and scores
 	for(int i=0;i<num_of_players;i++)
 	{
-		printf("%-30s%5d\n",players[i].name,players[i].score);
+		printw("%-30s%5d\n",players[i].name,players[i].score);
 	}
 	print_n_times('=',VIEW_WIDTH);
 	
@@ -174,39 +197,40 @@ void display()
 	int count=1;														//count the position number
 	
 	print_n_times('\n',ver_pad);										//print newlines for top padding of grid
-	printf("%*s",hor_pad,"+");											//print top border
+	printw("%*s",hor_pad,"+");											//print top border
 	print_n_times('-',((columns+1)*hor_pad)-1);
-	printf("+\n");
+	printw("+\n");
 	for(int i=0;i<rows;i++)												//loop for printing grid
 	{
 		for(int k=0;k<ver_pad-1;k++)									//print newlines for vertical gap in table;
 		{																//also print parts of side borders
-			printf("%*s",hor_pad,"|");
-			printf("%*s\n",((columns+1)*hor_pad),"|");
+			printw("%*s",hor_pad,"|");
+			printw("%*s\n",((columns+1)*hor_pad),"|");
 		}
 		
-		printf("%*s",hor_pad,"|");										//printing line containing row elements
+		printw("%*s",hor_pad,"|");										//printing line containing row elements
 		for(int j=0;j<columns;j++)
 		{
 			if(grid[i][j]=='\0')										//if element is null character print number in that place
-				printf("%*d",hor_pad,count);							//else print the letter
+				printw("%*d",hor_pad,count);							//else print the letter
 			else
-				printf("%*c",hor_pad,grid[i][j]);
+				printw("%*c",hor_pad,grid[i][j]);
 			count++;
 		}
-		printf("%*s\n",hor_pad,"|");
+		printw("%*s\n",hor_pad,"|");
 	}
 	for(int k=0;k<ver_pad-1;k++)										//print newlines for vertical gap after last row;
 	{																	//also print parts of side borders
-		printf("%*s",hor_pad,"|");
-		printf("%*s\n",((columns+1)*hor_pad),"|");
+		printw("%*s",hor_pad,"|");
+		printw("%*s\n",((columns+1)*hor_pad),"|");
 	}
-	printf("%*s",hor_pad,"+");											//print bottom border
+	printw("%*s",hor_pad,"+");											//print bottom border
 	print_n_times('-',((columns+1)*hor_pad)-1);
-	printf("+");
+	printw("+");
 	print_n_times('\n',ver_pad);										//print newlines for bottom padding of grid
 	print_n_times('=',VIEW_WIDTH);
-	printf("\n");
+	printw("\n");
+	refresh();
 }
 
 int game_is_not_over()
@@ -230,16 +254,21 @@ void game()
 	while(game_is_not_over() && pause_returned)									//game will run until there is empty place or not exited via pause
 	{
 		display();
-		printf("Turn of %s\n",players[turn%num_of_players].name);
+		printw("Turn of %s\n",players[turn%num_of_players].name);
 		
 		do 																		//repeat until S,O or P is input
 		{
-			printf("Enter the letter:");
-			scanf(" %c",&letter);
+			printw("Enter the letter:");
+			refresh();
+			scanw(" %c",&letter);
 			letter=toupper(letter);
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
-				printf("Invalid letter...Try again\n");
+			{
+				printw("Invalid letter...Try again\n");
+				refresh();
+			}
+				
 		}while(invalid);
 		
 		if(letter=='P')															//paused
@@ -251,13 +280,18 @@ void game()
 			int position;
 			do 																	//input position of move
 			{
-				printf("Enter the position number:");
-				scanf("%d",&position);
+				printw("Enter the position number:");
+				refresh();
+				scanw("%d",&position);
 				pos_i=(position-1)/columns;
 				pos_j=(position-1)%columns;
 				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
 				if(invalid)
-					printf("Invalid position...Try again\n");
+				{
+					printw("Invalid position...Try again\n");
+					refresh();
+				}
+					
 			}while(invalid);
 			
 			game_move(pos_i,pos_j,letter);
@@ -268,8 +302,9 @@ void game()
 	if(pause_returned) 															//if exiting loop via game over pause_returned will be 1
 	{																			//if loop exits via pause then no results are shown
 		results();
-		printf("\nPress Enter to continue...\n");								//hold on until user decides to continue
-		scanf("%*c%*c");
+		printw("\nPress Enter to continue...\n");								//hold on until user decides to continue
+		refresh();
+		scanw("%*c%*c");
 	}															
 	
 }
@@ -409,12 +444,12 @@ void results()
 	display();
 	if(count==1)																//there is only one winner
 	{
-		printf("\n%s won with %d score!!\n",players[max_index].name,max);		//display on screen
+		printw("\n%s won with %d score!!\n",players[max_index].name,max);		//display on screen
 		fprintf(fp,"%s won with %d score!!\n",players[max_index].name,max);		//write to records
 	}
 	else 																		//draw
 	{
-		printf("\nIt is a draw between %s",players[max_index].name)	;			//display first player name
+		printw("\nIt is a draw between %s",players[max_index].name)	;			//display first player name
 		fprintf(fp,"It is a draw between %s",players[max_index].name);			//write to records
 		for(int i=max_index+1,j=1 ;j<count ;i++)
 		{
@@ -422,23 +457,23 @@ void results()
 			{
 				if(j==count-1)													//if last name put "and" else put ","
 				{
-					printf(" and ");
+					printw(" and ");
 					fprintf(fp," and ");
 				}													
 				else
 				{
-					printf(", ");
+					printw(", ");
 					fprintf(fp,", ");
 				}
-				printf("%s",players[i].name);
+				printw("%s",players[i].name);
 				fprintf(fp,"%s",players[i].name);
 				j++;
 			}
 		}
-		printf(" with %d score\n",max);
+		printw(" with %d score\n",max);
 		fprintf(fp," with %d score\n",max);
 	}
-	
+	refresh();
 	fclose(fp);
 }
 
@@ -448,18 +483,22 @@ int pause()
 	int ch;
 	char yes_or_no;
 	
-	system(CLEAR);
-	printf("\n\t\tGame paused\n\n");
-	printf("\t1: Resume\n");
-	printf("\t2: Restart\n");
-	printf("\t3: Exit\n");
-	printf("\nEnter your choice:");
+	clear();
+	printw("\n\t\tGame paused\n\n");
+	printw("\t1: Resume\n");
+	printw("\t2: Restart\n");
+	printw("\t3: Exit\n");
+	printw("\nEnter your choice:");
+	refresh();
 	do
 	{
-		scanf("%d",&ch);
+		scanw("%d",&ch);
 		invalid=(ch<1 || ch>3);
 		if(invalid)
+		{
 			printf("Invalid option...Try again\n");
+			refresh();			
+		}
 	}while(invalid);
 	
 	switch(ch)
@@ -469,8 +508,9 @@ int pause()
 		case 1:
 			return 1;
 		case 3:
-			printf("Do you wish to save game for later?\n(y/N)");		//prompt for asking for saving to file
-			scanf("%*c%c",&yes_or_no);
+			printw("Do you wish to save game for later?\n(y/N)");		//prompt for asking for saving to file
+			refresh();
+			scanw("%*c%c",&yes_or_no);
 			if(tolower(yes_or_no)=='y')
 				save_game();				
 			return 0;
@@ -479,51 +519,52 @@ int pause()
 
 void help()
 {
-	system(CLEAR);
+	clear();
 	
-	printf("\tIntroduction and Rules\n");
-	printf("SOS is a game usually played on paper. \
+	printw("\tIntroduction and Rules\n");
+	printw("SOS is a game usually played on paper. \
 It conststs of a grid into which players enter either letter S or O to form SOS in a line. \
 The SOS pattern can be vertical, horizontal and diagonal.\n");
-	printf("Players take turns to enter S or O, if they make an SOS pattern they score a point. \
+	printw("Players take turns to enter S or O, if they make an SOS pattern they score a point. \
 If they score a point they get another chance to enter, \
 this rule applies to subsequent move as well. \
 i.e. they retain the turn until they are forming SOS pattern.");
-	printf("The game continues till all positions are filled. The player with highest score is the winner.\n\n");
+	printw("The game continues till all positions are filled. The player with highest score is the winner.\n\n");
 	
-	printf("\tNavigation\n");
-	printf("The game displays a menu on startup. It has Start new game,Continue saved game, Help, Records and Exit options.\n");
-	printf("To select an option enter the number of the option.\n");
-	printf("Start New Game displays new game wizard which leads through setup to start a game.\n");
-	printf("Continue saved game continues previously saved game. If no game is saved it will inform the same\n");
-	printf("Help opens this help page.\n");
-	printf("Records display the records of previously played games such as number of players, rows and columns and the result of game\n");
-	printf("Exit exits the game.\n\n");
+	printw("\tNavigation\n");
+	printw("The game displays a menu on startup. It has Start new game,Continue saved game, Help, Records and Exit options.\n");
+	printw("To select an option enter the number of the option.\n");
+	printw("Start New Game displays new game wizard which leads through setup to start a game.\n");
+	printw("Continue saved game continues previously saved game. If no game is saved it will inform the same\n");
+	printw("Help opens this help page.\n");
+	printw("Records display the records of previously played games such as number of players, rows and columns and the result of game\n");
+	printw("Exit exits the game.\n\n");
 	
-	printf("\tStart Game Wizard\n");
-	printf("This sets up the configuration of game.\n");
-	printf("It first asks to enter number of players. Minimum numberof players is 2 and Game allows maximum of %d players.\n",MAX_PLAYERS);
-	printf("It then asks for names of the players one by one.\n");
-	printf("Next, the number of rows are asked, minimum is %d and maximum is %d.\n",MIN_HEIGHT,MAX_HEIGHT);
-	printf("Next, the number of columns are asked, minimum is %d and maximum is %d.\n",MIN_WIDTH,MAX_WIDTH);
-	printf("The game setup is done.\n\n");
+	printw("\tStart Game Wizard\n");
+	printw("This sets up the configuration of game.\n");
+	printw("It first asks to enter number of players. Minimum numberof players is 2 and Game allows maximum of %d players.\n",MAX_PLAYERS);
+	printw("It then asks for names of the players one by one.\n");
+	printw("Next, the number of rows are asked, minimum is %d and maximum is %d.\n",MIN_HEIGHT,MAX_HEIGHT);
+	printw("Next, the number of columns are asked, minimum is %d and maximum is %d.\n",MIN_WIDTH,MAX_WIDTH);
+	printw("The game setup is done.\n\n");
 	
-	printf("\tGameplay and Controls\n");
-	printf("The names of players and their scores are displayed at top. \
+	printw("\tGameplay and Controls\n");
+	printw("The names of players and their scores are displayed at top. \
 The grid is displayed below it. Below this, a prompt to enter S or O is given. \
 After selecting the letter its position has to be selected by entering number corresponding to the position.\n\n");
 
-	printf("\tPause Menu\n");
-	printf("Pause menu is invoked by entering P at the prompt for selecting the letter. \
+	printw("\tPause Menu\n");
+	printw("Pause menu is invoked by entering P at the prompt for selecting the letter. \
 It displays options to Resume, Restart and Exit.\n");
-	printf("Resume just continues the game.\n");
-	printf("Restart restarts game by resetting the scores and board, \
+	printw("Resume just continues the game.\n");
+	printw("Restart restarts game by resetting the scores and board, \
 but retains the configuration of player names and size of board.\n");
-	printf("Exit is used to quit game and take user to main menu. A prompt is given asking if user wants to save the game.\
+	printw("Exit is used to quit game and take user to main menu. A prompt is given asking if user wants to save the game.\
 If yes is selected then the state of game is saved and it can be continued later using continue saved game in main menu\n\n");
 	
-	printf("\nPress Enter to continue...\n");								//hold on until user decides to continue
-	scanf("%*c%*c");
+	printw("\nPress Enter to continue...\n");								//hold on until user decides to continue
+	refresh();
+	scanw("%*c%*c");
 }
 
 void save_game()
@@ -557,9 +598,10 @@ void load_game()
 	}
 	else
 	{
-		printf("\n\tNo saved game found!");
-		printf("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
-		scanf("%*c%*c");
+		printw("\n\tNo saved game found!");
+		printw("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
+		refresh();
+		scanw("%*c%*c");
 	}
 }
 
@@ -571,11 +613,11 @@ void statistics()
 	{
 		int num,r,c;
 		char buf;
-		printf("No. of players     Rows * Columns     Result\n");		//heading of table
+		printw("No. of players     Rows * Columns     Result\n");		//heading of table
 		while(1)														//repeat until break is executed
 		{
 			fscanf(fp,"%d %d*%d",&num,&r,&c);							//read and print num of players, rows and columns
-			printf("%14d%9d * %-7d   ",num,r,c);
+			printw("%14d%9d * %-7d   ",num,r,c);
 			do 															//read and print characters until newline is found
 			{
 				buf=fgetc(fp);
@@ -591,8 +633,9 @@ void statistics()
 	}
 	else
 	{
-		printf("\n\tNo records found!");
+		printw("\n\tNo records found!");
 	}
-	printf("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
-	scanf("%*c%*c");
+	printw("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
+	refresh();
+	scanw("%*c%*c");
 }
