@@ -33,7 +33,7 @@ void start();												//setup wizard before starting a game,
 void reset();												//sets all grid positions to null character,
 															//sets all players score to 0,
 															//set turn to 0
-void display();												//display name of players along with scores and grid
+void display(WINDOW *canvas);												//display name of players along with scores and grid
 void print_n_times(char c,int n);							//a utility function to print given character n times
 int game_is_not_over();										//checks if there is some place empty,
 															//if a place is empty returns 1, if no place empty returns 0
@@ -42,7 +42,7 @@ void game_move(int pos_i,int pos_j,char letter);					//puts the letter at its po
 															//check if scoring and increment score,
 															//if not scored then increment turn
 
-void results();												//compute and display results, also stores records in a file
+void results(WINDOW *canvas);												//compute and display results, also stores records in a file
 int pause();												//pause menu, returns 0 if exit is selected, 1 otherwise
 void help();												//displays help
 void save_game();											//saves variables related to game in a file
@@ -262,9 +262,9 @@ void game()
 		else 																	//next move
 		{
 			int position;
+			mvwprintw(canvas,LINES-3,0,"Enter the position number:");
 			do 																	//input position of move
 			{
-				mvwprintw(canvas,LINES-3,0,"Enter the position number:");
 				wrefresh(canvas);
 				wscanw(canvas,"%d",&position);
 				pos_i=(position-1)/columns;
@@ -283,10 +283,7 @@ void game()
 	
 	if(pause_returned) 															//if exiting loop via game over pause_returned will be 1
 	{																			//if loop exits via pause then no results are shown
-		results();
-		printw("\nPress Enter to continue...\n");								//hold on until user decides to continue
-		refresh();
-		scanw("%*c%*c");
+		results(canvas);
 	}															
 	delwin(canvas);
 }
@@ -401,7 +398,7 @@ void game_move(int pos_i,int pos_j,char letter)
 		turn++;
 }
 
-void results()
+void results(WINDOW *canvas)
 {
 	int max=players[0].score;													//assume first player has highest score
 	int max_index=0;
@@ -423,16 +420,20 @@ void results()
 	FILE *fp=fopen("records.txt","a");											//open file for appending records
 	fprintf(fp,"%d %d*%d ",num_of_players,rows,columns);						//write number of players, rows and columns to file
 	
-	//display();
-	printw("Display supressed in result function\n");
+	display(canvas);
+	
+	WINDOW *result_win=newwin(LINES*0.3,COLS*0.8,LINES*0.3,COLS*0.1);
+	box(result_win,0,0);
+	wmove(result_win,1,2);
+	
 	if(count==1)																//there is only one winner
 	{
-		printw("\n%s won with %d score!!\n",players[max_index].name,max);		//display on screen
+		wprintw(result_win,"%s won with %d score!!",players[max_index].name,max);		//display on screen
 		fprintf(fp,"%s won with %d score!!\n",players[max_index].name,max);		//write to records
 	}
 	else 																		//draw
 	{
-		printw("\nIt is a draw between %s",players[max_index].name)	;			//display first player name
+		wprintw(result_win,"It is a draw between %s",players[max_index].name)	;			//display first player name
 		fprintf(fp,"It is a draw between %s",players[max_index].name);			//write to records
 		for(int i=max_index+1,j=1 ;j<count ;i++)
 		{
@@ -440,23 +441,27 @@ void results()
 			{
 				if(j==count-1)													//if last name put "and" else put ","
 				{
-					printw(" and ");
+					wprintw(result_win," and ");
 					fprintf(fp," and ");
 				}													
 				else
 				{
-					printw(", ");
+					wprintw(result_win,", ");
 					fprintf(fp,", ");
 				}
-				printw("%s",players[i].name);
+				wprintw(result_win,"%s",players[i].name);
 				fprintf(fp,"%s",players[i].name);
 				j++;
 			}
 		}
-		printw(" with %d score\n",max);
+		wprintw(result_win," with %d score",max);
 		fprintf(fp," with %d score\n",max);
 	}
-	refresh();
+	
+	mvwprintw(result_win,(LINES*0.3)-2,1,"Press any key to continue...");
+	wrefresh(result_win);	
+	wgetch(result_win);
+	delwin(result_win);
 	fclose(fp);
 }
 
