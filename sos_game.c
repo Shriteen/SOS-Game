@@ -13,7 +13,7 @@
 #define MIN_WIDTH 4
 #define MIN_HEIGHT 4
 //Minimum width and height of board. i.e. Min number of columns and rows
-#define VIEW_WIDTH 80 
+//#define VIEW_WIDTH 80 
 //width in terms of number of characters to optimize output for
 
 typedef struct{												//Declaring structure for players
@@ -165,11 +165,11 @@ void reset()
 	turn=0;
 }
 
-void print_n_times(char c,int n)
+/*void print_n_times(char c,int n)
 {
 	for(int i=0;i<n;i++)
 		addch(c);
-}
+}*/
 
 void display(WINDOW *canvas)
 {
@@ -183,14 +183,12 @@ void display(WINDOW *canvas)
 		mvwprintw(canvas,1+i,COLS/2,"%d\n",players[i].score);
 	}
 	
-	
-	
 	wrefresh(canvas);
 	whline(canvas,'=',COLS);
 	
-	int hor_pad=round((float)VIEW_WIDTH/(float)(columns+3));			//compute horizontal gap
-	int ver_pad=round(hor_pad*0.47);									//compute vertical gap
-	int count=1;														//count the position number
+	int hor_pad=round( (float)COLS / (float)(columns+3) );							//compute horizontal gap
+	int ver_pad=round( (float)(LINES - num_of_players - 4) / (float)(rows+3) );		//compute vertical gap
+	int count=1;																	//count the position number
 	
 	int x,y;
 	getyx(canvas,y,x);
@@ -244,8 +242,8 @@ void game()
 	while(game_is_not_over() && pause_returned)									//game will run until there is empty place or not exited via pause
 	{
 		display(canvas);
-		mvwprintw(canvas,LINES-4,0,"Turn of %s\n",players[turn%num_of_players].name);
-		mvwprintw(canvas,LINES-3,0,"Enter the letter:");
+		mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
+		mvwprintw(canvas,LINES-1,0,"Enter the letter:");
 		wrefresh(canvas);
 		do 																		//repeat until S,O or P is input
 		{
@@ -254,7 +252,7 @@ void game()
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
 			{
-				mvwprintw(canvas,LINES-3,0,"Invalid letter...Try again\n");
+				mvwprintw(canvas,LINES-1,0,"Invalid letter...Try again\n");
 				wrefresh(canvas);
 			}
 				
@@ -267,7 +265,7 @@ void game()
 		else 																	//next move
 		{
 			int position;
-			mvwprintw(canvas,LINES-3,0,"Enter the position number:");
+			mvwprintw(canvas,LINES-1,0,"Enter the position number:");
 			do 																	//input position of move
 			{
 				wrefresh(canvas);
@@ -277,13 +275,12 @@ void game()
 				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
 				if(invalid)
 				{
-					mvwprintw(canvas,LINES-3,0,"Invalid position...Try again\n");
+					mvwprintw(canvas,LINES-1,0,"Invalid position...Try again\n");
 					wrefresh(canvas);
 				}
 			}while(invalid);
 			game_move(pos_i,pos_j,letter);
 		}
-
 	}
 	
 	if(pause_returned) 															//if exiting loop via game over pause_returned will be 1
