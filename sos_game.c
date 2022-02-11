@@ -574,10 +574,10 @@ void load_game()
 	}
 	else
 	{
-		printw("\n\tNo saved game found!");
-		printw("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
+		printw("\n\tNo saved game found!\n\n");
+		printw("Press any key to continue...");						//hold on until user decides to continue
 		refresh();
-		scanw("%*c%*c");
+		getch();
 	}
 }
 
