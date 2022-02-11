@@ -33,7 +33,6 @@ void reset();												//sets all grid positions to null character,
 															//sets all players score to 0,
 															//set turn to 0
 void display(WINDOW *canvas);												//display name of players along with scores and grid
-void print_n_times(char c,int n);							//a utility function to print given character n times
 int game_is_not_over();										//checks if there is some place empty,
 															//if a place is empty returns 1, if no place empty returns 0
 void game();												//the loop in which gameplay happens
@@ -473,9 +472,7 @@ void results(WINDOW *canvas)
 
 int pause()
 {
-	int invalid;
 	int ch;
-	char yes_or_no;
 	WINDOW *pause_menu=newwin(0,0,0,0);
 	
 	const char *options[]={	"Game paused",
