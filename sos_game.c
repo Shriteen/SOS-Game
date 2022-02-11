@@ -598,7 +598,7 @@ void statistics()
 			do 															//read and print characters until newline is found
 			{
 				buf=fgetc(fp);
-				putchar(buf);
+				addch(buf);
 			}while(buf!='\n');
 			
 			buf=fgetc(fp);												//read a character and check if it is EOF
@@ -612,9 +612,9 @@ void statistics()
 	{
 		printw("\n\tNo records found!");
 	}
-	printw("\n\nPress Enter to continue...\n");						//hold on until user decides to continue
+	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold on until user decides to continue
 	refresh();
-	scanw("%*c%*c");
+	getch();
 }
 
 int generic_menu(WINDOW *win,const char* options[],int num_options)
