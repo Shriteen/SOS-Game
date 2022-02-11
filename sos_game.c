@@ -245,11 +245,18 @@ void game()
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
 			{
-				mvwprintw(canvas,LINES-1,0,"Invalid letter...Try again:");
-				wrefresh(canvas);
+				display(canvas);
+				mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
+				wmove(canvas,LINES-1,0);
+				wclrtoeol(canvas);
+				wprintw(canvas,"Invalid letter...Try again:");
 			}
-				
+			wrefresh(canvas);
 		}while(invalid);
+		
+		wmove(canvas,LINES-1,0);
+		wclrtoeol(canvas);
+		
 		
 		if(letter=='P')															//paused
 		{
@@ -268,9 +275,13 @@ void game()
 				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
 				if(invalid)
 				{
-					mvwprintw(canvas,LINES-1,0,"Invalid position...Try again:");
-					wrefresh(canvas);
+					display(canvas);
+					mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
+					wmove(canvas,LINES-1,0);
+					wclrtoeol(canvas);
+					wprintw(canvas,"Invalid position...Try again:");
 				}
+				wrefresh(canvas);
 			}while(invalid);
 			game_move(pos_i,pos_j,letter);
 		}
