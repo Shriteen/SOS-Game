@@ -13,8 +13,7 @@
 #define MIN_WIDTH 4
 #define MIN_HEIGHT 4
 //Minimum width and height of board. i.e. Min number of columns and rows
-//#define VIEW_WIDTH 80 
-//width in terms of number of characters to optimize output for
+
 
 typedef struct{												//Declaring structure for players
 	char name[30];											//name of player
@@ -164,12 +163,6 @@ void reset()
 	
 	turn=0;
 }
-
-/*void print_n_times(char c,int n)
-{
-	for(int i=0;i<n;i++)
-		addch(c);
-}*/
 
 void display(WINDOW *canvas)
 {
