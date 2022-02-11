@@ -10,8 +10,8 @@
 #define MAX_WIDTH 14
 #define MAX_HEIGHT 14
 //Maximum width and height of board. i.e. Max number of columns and rows 
-#define MIN_WIDTH 1
-#define MIN_HEIGHT 1
+#define MIN_WIDTH 4
+#define MIN_HEIGHT 4
 //Minimum width and height of board. i.e. Min number of columns and rows
 
 
@@ -240,12 +240,12 @@ void game()
 		wrefresh(canvas);
 		do 																		//repeat until S,O or P is input
 		{
-			wscanw(canvas," %c",&letter);
+			letter=wgetch(canvas);
 			letter=toupper(letter);
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
 			{
-				mvwprintw(canvas,LINES-1,0,"Invalid letter...Try again\n");
+				mvwprintw(canvas,LINES-1,0,"Invalid letter...Try again:");
 				wrefresh(canvas);
 			}
 				
@@ -268,7 +268,7 @@ void game()
 				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
 				if(invalid)
 				{
-					mvwprintw(canvas,LINES-1,0,"Invalid position...Try again\n");
+					mvwprintw(canvas,LINES-1,0,"Invalid position...Try again:");
 					wrefresh(canvas);
 				}
 			}while(invalid);
