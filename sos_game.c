@@ -538,9 +538,10 @@ but retains the configuration of player names and size of board.\n");
 	printw("Exit is used to quit game and take user to main menu. A prompt is given asking if user wants to save the game.\
 If yes is selected then the state of game is saved and it can be continued later using continue saved game in main menu\n\n");
 	
-	printw("\nPress Enter to continue...\n");								//hold on until user decides to continue
+	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold on until user decides to continue
 	refresh();
-	scanw("%*c%*c");
+	getch();
+	
 }
 
 void save_game()
