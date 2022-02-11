@@ -10,8 +10,8 @@
 #define MAX_WIDTH 14
 #define MAX_HEIGHT 14
 //Maximum width and height of board. i.e. Max number of columns and rows 
-#define MIN_WIDTH 4
-#define MIN_HEIGHT 4
+#define MIN_WIDTH 1
+#define MIN_HEIGHT 1
 //Minimum width and height of board. i.e. Min number of columns and rows
 
 
@@ -417,9 +417,9 @@ void results(WINDOW *canvas)
 	
 	display(canvas);
 	
-	WINDOW *result_win=newwin(LINES*0.3,COLS*0.8,LINES*0.3,COLS*0.1);
-	box(result_win,0,0);
-	wmove(result_win,1,2);
+	WINDOW *result_win=newwin(LINES*0.3,COLS,LINES*0.3,0);
+	wborder(result_win,' ',' ',0,0,ACS_HLINE,ACS_HLINE,ACS_HLINE,ACS_HLINE);
+	wmove(result_win,1,1);
 	
 	if(count==1)																//there is only one winner
 	{
