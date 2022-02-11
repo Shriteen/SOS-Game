@@ -4,7 +4,6 @@
 #include<ctype.h>
 #include<ncurses.h>
 
-
 #define MAX_PLAYERS 10
 //Maximum players in a game
 #define MAX_WIDTH 14
@@ -32,21 +31,19 @@ void start();												//setup wizard before starting a game,
 void reset();												//sets all grid positions to null character,
 															//sets all players score to 0,
 															//set turn to 0
-void display(WINDOW *canvas);												//display name of players along with scores and grid
+void display(WINDOW *canvas);								//display name of players along with scores and grid
 int game_is_not_over();										//checks if there is some place empty,
 															//if a place is empty returns 1, if no place empty returns 0
 void game();												//the loop in which gameplay happens
-void game_move(int pos_i,int pos_j,char letter);					//puts the letter at its position,
+void game_move(int pos_i,int pos_j,char letter);			//puts the letter at its position,
 															//check if scoring and increment score,
 															//if not scored then increment turn
-
-void results(WINDOW *canvas);												//compute and display results, also stores records in a file
+void results(WINDOW *canvas);								//compute and display results, also stores records in a file
 int pause();												//pause menu, returns 0 if exit is selected, 1 otherwise
 void help();												//displays help
 void save_game();											//saves variables related to game in a file
 void load_game();											//loads variables related to game from file
 void statistics();											//display records from file
-
 int generic_menu(WINDOW *win,const char* options[],int num_options);	//accept a list of options and number of options
 																		//0th item in list is title of menu
 																		//displays options and return number of option selected
@@ -57,8 +54,7 @@ int generic_boolean_menu(WINDOW *win,const char* question);				//accepts a title
 
 int main()
 {
-	initscr();
-	
+	initscr();													//initialise ncurses
 	int ch;
 	do
 	{
@@ -69,7 +65,7 @@ int main()
 								"Records",
 								"Exit"				};
 		ch=generic_menu(stdscr,options,5);						//display and input main menu
-		clear();
+		clear();												//clear screen and call respective function
 		switch(ch)
 		{
 			case 1:
@@ -87,16 +83,16 @@ int main()
 		}
 	}while(ch!=5);
 	
-	endwin();
+	endwin();													//exit ncurses
 }
 
 void start()
 {
-	WINDOW *wizard=newwin(0,0,0,0);
+	WINDOW *wizard=newwin(0,0,0,0);							//create new fullscreen window and clear screen
 	wclear(wizard);
 	int invalid;											//variable used to check validity of input
 	
-	wprintw(wizard,"Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);								//input number of players
+	wprintw(wizard,"Enter number of players\t(Min:2,Max:%d)\n",MAX_PLAYERS);				//input number of players
 	wrefresh(wizard);
 	do
 	{
@@ -109,7 +105,7 @@ void start()
 		}
 	}while(invalid);
 	
-	wprintw(wizard,"Enter player names\t\t(It should be one word without spaces)\n");						//input player names
+	wprintw(wizard,"Enter player names\t\t(It should be one word without spaces)\n");			//input player names
 	wrefresh(wizard);
 	for(int i=0;i<num_of_players;i++)
 	{
@@ -118,7 +114,7 @@ void start()
 		wscanw(wizard,"%s",players[i].name);
 	}
 	
-	wprintw(wizard,"Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);						//input number of rows
+	wprintw(wizard,"Enter number of rows\t(Min:%d,Max:%d)\n",MIN_HEIGHT,MAX_HEIGHT);			//input number of rows
 	wrefresh(wizard);
 	do
 	{
@@ -131,7 +127,7 @@ void start()
 		}
 	}while(invalid);
 	
-	wprintw(wizard,"Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);						//input number of columns
+	wprintw(wizard,"Enter number of columns\t(Min:%d,Max:%d)\n",MIN_WIDTH,MAX_WIDTH);			//input number of columns
 	wrefresh(wizard);
 	do
 	{
@@ -145,9 +141,11 @@ void start()
 	}while(invalid);
 	
 	reset();
-	wclear(wizard);
+	
+	wclear(wizard);														//clean wizard window
 	wrefresh(wizard);
 	delwin(wizard);
+	
 	game();
 }
 
@@ -167,15 +165,13 @@ void display(WINDOW *canvas)
 {
 	wclear(canvas);
 	
-	mvwprintw(canvas,0,0,"Name of player");
-	mvwprintw(canvas,0,COLS/2,"Score\n");
+	mvwprintw(canvas,0,0,"Name of player");								//Display names and scores of player in two columns
+	mvwprintw(canvas,0,COLS/2,"Score\n");								//having 50%-50% width
 	for(int i=0;i<num_of_players;i++)
 	{
 		wprintw(canvas,"%s",players[i].name);
 		mvwprintw(canvas,1+i,COLS/2,"%d\n",players[i].score);
 	}
-	
-	wrefresh(canvas);
 	whline(canvas,'=',COLS);
 	
 	int hor_pad=round( (float)COLS / (float)(columns+3) );							//compute horizontal gap
@@ -183,9 +179,8 @@ void display(WINDOW *canvas)
 	int count=1;																	//count the position number
 	
 	int x,y;
-	getyx(canvas,y,x);
-	
-	mvwhline(canvas,y+ver_pad,hor_pad,0,(columns+1)*hor_pad);
+	getyx(canvas,y,x);													//save cursor position so that border can be drawn relative to it
+	mvwhline(canvas,y+ver_pad,hor_pad,0,(columns+1)*hor_pad);			//draw borders around grid
 	mvwvline(canvas,y+ver_pad+1,hor_pad,0,(rows+1)*ver_pad);
 	mvwhline(canvas,y+((rows+2)*ver_pad),hor_pad,0,(columns+1)*hor_pad);
 	mvwvline(canvas,y+ver_pad,(columns+2)*hor_pad,0,(rows+1)*ver_pad);
@@ -194,15 +189,15 @@ void display(WINDOW *canvas)
 	mvwaddch(canvas,y+ver_pad,(columns+2)*hor_pad,ACS_URCORNER);
 	mvwaddch(canvas,y+((rows+2)*ver_pad),(columns+2)*hor_pad,ACS_LRCORNER);
 	
-	wmove(canvas,y+(2*ver_pad),2*hor_pad);
-	getyx(canvas,y,x);
+	wmove(canvas,y+(2*ver_pad),2*hor_pad);								//set cursor position to first element
+	getyx(canvas,y,x);													//save cursor position so that grid can be drawn relative to it
 	for(int i=0;i<rows;i++)												//loop for printing grid
 	{	
 		for(int j=0;j<columns;j++)
 		{
-			wmove(canvas,y+(ver_pad*i),x+(hor_pad*j));
+			wmove(canvas,y+(ver_pad*i),x+(hor_pad*j));					//move to position
 			if(grid[i][j]=='\0')										//if element is null character print number in that place
-				wprintw(canvas,"%d",count);							//else print the letter
+				wprintw(canvas,"%d",count);								//else print the letter
 			else
 				wprintw(canvas,"%c",grid[i][j]);
 			count++;
@@ -222,21 +217,22 @@ int game_is_not_over()
 
 void game()
 {
-	remove("saved_game");														//delete the file having any previously saved game
+	remove("saved_game");												//delete the file having any previously saved game
 	
-	int pause_returned=1;														//variable to check if we want to exit via pause
-	char letter;																//to store input letter 
-	int invalid;																//temprory variable to check if input is valid
-	int pos_i,pos_j;															//variables to store position in matrix
+	int pause_returned=1;												//variable to check if we want to exit via pause
+	char letter;														//to store input letter 
+	int invalid;														//temprory variable to check if input is valid
+	int pos_i,pos_j;													//variables to store position in matrix
 	
-	WINDOW *canvas=newwin(0,0,0,0);
+	WINDOW *canvas=newwin(0,0,0,0);										//create new fullscreen window
 	
-	while(game_is_not_over() && pause_returned)									//game will run until there is empty place or not exited via pause
+	while(game_is_not_over() && pause_returned)							//game will run until there is empty place or not exited via pause
 	{
-		display(canvas);
+		display(canvas);														//draw board and display prompt
 		mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
 		mvwprintw(canvas,LINES-1,0,"Enter the letter:");
 		wrefresh(canvas);
+		
 		do 																		//repeat until S,O or P is input
 		{
 			letter=wgetch(canvas);
@@ -244,53 +240,56 @@ void game()
 			invalid=(letter!='S' && letter!='O' && letter!='P');
 			if(invalid)
 			{
-				display(canvas);
+				display(canvas);												//clean the text present previously at prompt position
 				mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
 				wmove(canvas,LINES-1,0);
 				wclrtoeol(canvas);
+				
 				wprintw(canvas,"Invalid letter...Try again:");
 			}
 			wrefresh(canvas);
 		}while(invalid);
 		
-		wmove(canvas,LINES-1,0);
+		wmove(canvas,LINES-1,0);										//clean the text present previously at prompt position
 		wclrtoeol(canvas);
 		
-		
-		if(letter=='P')															//paused
+		if(letter=='P')													//paused
 		{
 			pause_returned=pause();
 		}
-		else 																	//next move
+		else 															//next move
 		{
 			int position;
-			mvwprintw(canvas,LINES-1,0,"Enter the position number:");
-			do 																	//input position of move
+			mvwprintw(canvas,LINES-1,0,"Enter the position number:");	//prompt and input position of move
+			do 																	
 			{
 				wrefresh(canvas);
 				wscanw(canvas,"%d",&position);
 				pos_i=(position-1)/columns;
 				pos_j=(position-1)%columns;
-				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or position is already occupied
+				invalid=position<1 || position>(rows*columns) || grid[pos_i][pos_j]!='\0';		//invalid if either out of bounds or
+																								//position is already occupied
 				if(invalid)
 				{
-					display(canvas);
+					display(canvas);											//clean the text present previously at prompt position
 					mvwprintw(canvas,LINES-2,0,"Turn of %s\n",players[turn%num_of_players].name);
 					wmove(canvas,LINES-1,0);
 					wclrtoeol(canvas);
+					
 					wprintw(canvas,"Invalid position...Try again:");
 				}
-				wrefresh(canvas);
 			}while(invalid);
+			
 			game_move(pos_i,pos_j,letter);
 		}
 	}
 	
-	if(pause_returned) 															//if exiting loop via game over pause_returned will be 1
-	{																			//if loop exits via pause then no results are shown
+	if(pause_returned) 													//if exiting loop via game over pause_returned will be 1
+	{																	//if loop exits via pause then no results are shown
 		results(canvas);
 	}															
-	delwin(canvas);
+	
+	delwin(canvas);														//delete the gameplay window
 }
 
 void game_move(int pos_i,int pos_j,char letter)
@@ -427,19 +426,19 @@ void results(WINDOW *canvas)
 	
 	display(canvas);
 	
-	WINDOW *result_win=newwin(LINES*0.3,COLS,LINES*0.3,0);
+	WINDOW *result_win=newwin(LINES*0.3,COLS,LINES*0.3,0);						//create overlay dialogue window and set border
 	wborder(result_win,' ',' ',0,0,ACS_HLINE,ACS_HLINE,ACS_HLINE,ACS_HLINE);
-	wmove(result_win,1,1);
+	wmove(result_win,1,1);														//set cursor at position so that it won't overwrite border
 	
 	if(count==1)																//there is only one winner
 	{
 		wprintw(result_win,"%s won with %d score!!",players[max_index].name,max);		//display on screen
-		fprintf(fp,"%s won with %d score!!\n",players[max_index].name,max);		//write to records
+		fprintf(fp,"%s won with %d score!!\n",players[max_index].name,max);				//write to records
 	}
 	else 																		//draw
 	{
-		wprintw(result_win,"It is a draw between %s",players[max_index].name)	;			//display first player name
-		fprintf(fp,"It is a draw between %s",players[max_index].name);			//write to records
+		wprintw(result_win,"It is a draw between %s",players[max_index].name);			//display first player name
+		fprintf(fp,"It is a draw between %s",players[max_index].name);					//write to records
 		for(int i=max_index+1,j=1 ;j<count ;i++)
 		{
 			if(players[i].score==max)											//print names of players having high score
@@ -463,24 +462,25 @@ void results(WINDOW *canvas)
 		fprintf(fp," with %d score\n",max);
 	}
 	
-	mvwprintw(result_win,(LINES*0.3)-2,1,"Press any key to continue...");
+	mvwprintw(result_win,(LINES*0.3)-2,1,"Press any key to continue...");		//hold until user proceeds
 	wrefresh(result_win);	
 	wgetch(result_win);
-	delwin(result_win);
+	
+	delwin(result_win);													//delete window and close file
 	fclose(fp);
 }
 
 int pause()
 {
 	int ch;
-	WINDOW *pause_menu=newwin(0,0,0,0);
+	WINDOW *pause_menu=newwin(0,0,0,0);									//create fullscreen window
 	
-	const char *options[]={	"Game paused",
+	const char *options[]={	"Game paused",								//pause menu options
 							"Resume",
 							"Restart",
 							"Exit"
 										};
-	ch=generic_menu(pause_menu,options,3);
+	ch=generic_menu(pause_menu,options,3);								//display menu and input options
 	switch(ch)
 	{
 		case 2:
@@ -541,10 +541,9 @@ but retains the configuration of player names and size of board.\n");
 	printw("Exit is used to quit game and take user to main menu. A prompt is given asking if user wants to save the game.\
 If yes is selected then the state of game is saved and it can be continued later using continue saved game in main menu\n\n");
 	
-	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold on until user decides to continue
+	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold until user decides to continue
 	refresh();
 	getch();
-	
 }
 
 void save_game()
@@ -579,7 +578,7 @@ void load_game()
 	else
 	{
 		printw("\n\tNo saved game found!\n\n");
-		printw("Press any key to continue...");						//hold on until user decides to continue
+		printw("Press any key to continue...");						//hold until user decides to continue
 		refresh();
 		getch();
 	}
@@ -615,47 +614,53 @@ void statistics()
 	{
 		printw("\n\tNo records found!");
 	}
-	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold on until user decides to continue
+	
+	mvprintw(LINES-2,0,"\nPress any key to continue...\n");						//hold until user decides to continue
 	refresh();
 	getch();
 }
 
 int generic_menu(WINDOW *win,const char* options[],int num_options)
 {
-	noecho();
-	keypad(win,TRUE);
+	noecho();												//do not echo pressed keystrokes on screen
+	keypad(win,TRUE);										//turn on keypad usage
 	wclear(win);
-	mvwprintw(win,1,30,"%s",options[0]);
-	int selected=1;
-	for(int i=1;i<=num_options;i++)
+	
+	mvwprintw(win,1,30,"%s",options[0]);					//display heading of menu
+	
+	int selected=1;											//variable to keep tract of selection,
+															//by default first option is selected
+	for(int i=1;i<=num_options;i++)							//display options
 	{
 		mvwprintw(win,2+i,15,"%s",options[i]);
 	}
-	mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);
+	
+	mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);			//highlight default selection
 	wrefresh(win);
-	while(1)
+	
+	while(1)												//repeat until an option is not selected using enter
 	{
-		int ch=wgetch(win);
-		mvwchgat(win,2+selected,0,-1,A_NORMAL,0,NULL);
+		int ch=wgetch(win);									//input keystroke
+		mvwchgat(win,2+selected,0,-1,A_NORMAL,0,NULL);		//unhighlight the selected entry 
 		switch(ch)
 		{
-			case KEY_UP:
+			case KEY_UP:							//for up; if on first option, then wrap to last option, select upper option otherwise
 				if(selected==1)
 					selected=num_options;
 				else
 					selected--;
 				break;
-			case KEY_DOWN:
+			case KEY_DOWN:							//for down; if on last option, then wrap to first option, select lower option otherwise
 				if(selected==num_options)
 					selected=1;
 				else
 					selected++;
 				break;
 			case 10:
-				echo();
+				echo();								//if enter pressed; turn back echo on and return selected
 				return selected;
 		}
-		mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);
+		mvwchgat(win,2+selected,0,-1,A_REVERSE,0,NULL);		//highlight selected option
 		wrefresh(win);
 	}
 }
@@ -663,11 +668,11 @@ int generic_menu(WINDOW *win,const char* options[],int num_options)
 int generic_boolean_menu(WINDOW *win,const char* question)
 {
 	int ch;
-	const char *options[]={	question,
+	const char *options[]={	question,				//fixed options to show
 							"No",
 							"Yes"	};
-	ch=generic_menu(win,options,2);
-	if(ch==1)
+	ch=generic_menu(win,options,2);					//display menu
+	if(ch==1)										//return 1 if yes is selected, 0 if no
 		return 0;
 	else
 		return 1;
