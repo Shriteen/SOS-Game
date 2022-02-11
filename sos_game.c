@@ -174,12 +174,17 @@ void print_n_times(char c,int n)
 void display(WINDOW *canvas)
 {
 	wclear(canvas);
-		
-	mvwprintw(canvas,0,0,"%-30s%s\n","Name of player","Score");						//display player names and scores	
+	
+	mvwprintw(canvas,0,0,"Name of player");
+	mvwprintw(canvas,0,COLS/2,"Score\n");
 	for(int i=0;i<num_of_players;i++)
 	{
-		wprintw(canvas,"%-30s%5d\n",players[i].name,players[i].score);
+		wprintw(canvas,"%s",players[i].name);
+		mvwprintw(canvas,1+i,COLS/2,"%d\n",players[i].score);
 	}
+	
+	
+	
 	wrefresh(canvas);
 	whline(canvas,'=',COLS);
 	
