@@ -1,0 +1,21 @@
+#+TITLE: SOS Game in Terminal using ncurses
+
+Play SOS game inside Terminal!
+
+[[file:screenshots/title_screen.png]]
+
+* Responsive design in Terminal!
+[[file:screenshots/responsive1.png]]
+[[file:screenshots/responsive2.png]]
+[[file:screenshots/responsive3.png]]
+
+* Supports wide range of board size
+[[file:screenshots/large_board.png]]
+
+* Feature of saving game for later
+[[file:screenshots/save_game.png]]
+
+* Keeps statistics of games played and more!
+
+
+
